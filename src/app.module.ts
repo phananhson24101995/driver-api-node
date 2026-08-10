@@ -15,6 +15,8 @@ import { StudentModule } from './api/student/student.module';
 import { CourseModule } from './api/course/course.module';
 import { DatModule } from './api/dat/dat.module';
 import { StudyScheduleModule } from './api/study-schedule/study-schedule.module';
+import { RefreshTokenManagementModule } from './api/refresh-token/refresh-token.module';
+import { DatHistoryManagementModule } from './api/dat-history/dat-history.module';
 
 @Module({
   imports: [
@@ -51,6 +53,8 @@ import { StudyScheduleModule } from './api/study-schedule/study-schedule.module'
     CourseModule,
     DatModule,
     StudyScheduleModule,
+    RefreshTokenManagementModule,
+    DatHistoryManagementModule,
   ],
   controllers: [AppController],
   providers: [

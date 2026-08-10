@@ -22,6 +22,9 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { ResponseMessage } from '../../common/decorators/response-message.decorator';
 import { ApiTags, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
+// [SECURITY] Import RBAC - Phân quyền API theo vai trò
+import { Roles } from '../../common/decorators/roles.decorator';
+import { RolesGuard } from '../../common/guards/roles.guard';
 
 @ApiTags('Courses')
 @ApiBearerAuth()
@@ -66,16 +69,20 @@ export class CourseController {
     return item;
   }
 
+  // [SECURITY] admin và admin-teacher được tạo khóa học mới
   @Post()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('admin', 'admin-teacher')
   @HttpCode(HttpStatus.OK)
   @ResponseMessage('Tạo khóa học thành công')
   async create(@Body() dto: CourseCreateDto) {
     return this.courseService.create(dto);
   }
 
+  // [SECURITY] admin và admin-teacher được cập nhật khóa học
   @Put(':id')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('admin', 'admin-teacher')
   @HttpCode(HttpStatus.OK)
   @ResponseMessage('Cập nhật khóa học thành công')
   async update(
@@ -89,8 +96,10 @@ export class CourseController {
     return result;
   }
 
+  // [SECURITY] admin và admin-teacher được xóa khóa học
   @Delete(':id')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('admin', 'admin-teacher')
   @HttpCode(HttpStatus.OK)
   @ResponseMessage('Xóa khóa học thành công')
   async delete(@Param('id', ParseIntPipe) id: number) {

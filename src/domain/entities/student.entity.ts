@@ -40,8 +40,9 @@ export class Student {
   @Prop()
   ethnicity?: string;
 
-  @Prop({ required: true })
-  account_id: number;
+  @Prop()
+  // Không bắt buộc khi mới tạo học viên (có thể cấp tài khoản sau)
+  account_id?: number;
 
   @Prop()
   course_id?: number;

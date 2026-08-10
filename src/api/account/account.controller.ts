@@ -33,8 +33,8 @@ import { RolesGuard } from '../../common/guards/roles.guard';
 @Controller('api/Account')
 // [SECURITY] Yêu cầu đăng nhập + kiểm tra quyền cho toàn bộ controller
 @UseGuards(AuthGuard('jwt'), RolesGuard)
-// [SECURITY] Chỉ admin mới được quản lý tài khoản
-@Roles('admin')
+// [SECURITY] Chỉ admin và admin-teacher mới được quản lý tài khoản
+@Roles('admin', 'admin-teacher')
 export class AccountController {
   constructor(private readonly accountService: AccountService) {}
 

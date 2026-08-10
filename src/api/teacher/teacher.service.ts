@@ -38,8 +38,30 @@ export class TeacherService {
       .limit(pageSize)
       .exec();
 
+    const itemsObject = items.map((item) => item.toObject() as Teacher);
+
+    // Lấy danh sách account_id để query username
+    const accountIds = itemsObject
+      .map((item) => item.account_id)
+      .filter((id) => id != null);
+
+    if (accountIds.length > 0) {
+      const accounts = await this.accountModel
+        .find({ id: { $in: accountIds } })
+        .exec();
+      const accountMap = new Map(
+        accounts.map((acc) => [acc.id, acc.toObject()]),
+      );
+
+      itemsObject.forEach((item) => {
+        if (item.account_id && accountMap.has(item.account_id)) {
+          (item as any).account = accountMap.get(item.account_id);
+        }
+      });
+    }
+
     return {
-      Items: items.map((item) => item.toObject() as Teacher),
+      Items: itemsObject,
       TotalCount: totalCount,
     };
   }

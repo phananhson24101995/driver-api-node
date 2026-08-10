@@ -72,20 +72,20 @@ export class DatController {
     return item;
   }
 
-  // [SECURITY] Chỉ admin mới được tạo thiết bị DAT mới
+  // [SECURITY] admin và admin-teacher được tạo thiết bị DAT mới
   @Post()
   @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles('admin')
+  @Roles('admin', 'admin-teacher')
   @HttpCode(HttpStatus.OK)
   @ResponseMessage('Tạo DAT thành công')
   async create(@Body() dto: DatCreateDto) {
     return this.datService.create(dto);
   }
 
-  // [SECURITY] Chỉ admin mới được cập nhật thông tin DAT
+  // [SECURITY] admin, admin-teacher và teacher được cập nhật thông tin DAT (để đổi người giữ)
   @Put(':id')
   @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles('admin')
+  @Roles('admin', 'admin-teacher', 'teacher')
   @HttpCode(HttpStatus.OK)
   @ResponseMessage('Cập nhật DAT thành công')
   async update(
@@ -99,10 +99,10 @@ export class DatController {
     return result;
   }
 
-  // [SECURITY] Chỉ admin mới được xóa thiết bị DAT
+  // [SECURITY] admin và admin-teacher được xóa thiết bị DAT
   @Delete(':id')
   @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles('admin')
+  @Roles('admin', 'admin-teacher')
   @HttpCode(HttpStatus.OK)
   @ResponseMessage('Xóa DAT thành công')
   async delete(@Param('id', ParseIntPipe) id: number) {

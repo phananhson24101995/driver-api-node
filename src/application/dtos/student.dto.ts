@@ -6,7 +6,7 @@ import {
   IsDateString,
   IsEmail,
 } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, PartialType } from '@nestjs/swagger';
 
 export class StudentCreateDto {
   @ApiProperty({ description: 'Họ và tên' })
@@ -80,4 +80,4 @@ export class StudentCreateDto {
   teacher_id?: number;
 }
 
-export class StudentUpdateDto extends StudentCreateDto {}
+export class StudentUpdateDto extends PartialType(StudentCreateDto) {}

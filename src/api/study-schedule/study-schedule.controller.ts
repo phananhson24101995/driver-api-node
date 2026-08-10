@@ -92,20 +92,20 @@ export class StudyScheduleController {
     return item;
   }
 
-  // [SECURITY] Tạo lịch học - yêu cầu đăng nhập, admin và teacher đều được phép
+  // [SECURITY] Tạo lịch học - yêu cầu đăng nhập, tất cả các role đều được phép
   @Post()
   @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles('admin', 'teacher')
+  @Roles('admin', 'admin-teacher', 'teacher')
   @HttpCode(HttpStatus.OK)
   @ResponseMessage('Tạo lịch học thành công')
   async create(@Body() dto: StudyScheduleCreateDto) {
     return this.studyScheduleService.create(dto);
   }
 
-  // [SECURITY] Cập nhật lịch học (endpoint update-schedule) - admin và teacher đều được phép
+  // [SECURITY] Cập nhật lịch học (endpoint update-schedule) - tất cả các role đều được phép
   @Put('update-schedule/:id')
   @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles('admin', 'teacher')
+  @Roles('admin', 'admin-teacher', 'teacher')
   @HttpCode(HttpStatus.OK)
   @ResponseMessage('Cập nhật lịch học thành công')
   async updateSchedule(
@@ -119,10 +119,10 @@ export class StudyScheduleController {
     return result;
   }
 
-  // [SECURITY] Cập nhật lịch học (endpoint chính) - admin và teacher đều được phép
+  // [SECURITY] Cập nhật lịch học (endpoint chính) - tất cả các role đều được phép
   @Put(':id')
   @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles('admin', 'teacher')
+  @Roles('admin', 'admin-teacher', 'teacher')
   @HttpCode(HttpStatus.OK)
   @ResponseMessage('Cập nhật lịch học thành công')
   async update(
@@ -136,10 +136,10 @@ export class StudyScheduleController {
     return result;
   }
 
-  // [SECURITY] Xóa lịch học - admin và teacher đều được phép
+  // [SECURITY] Xóa lịch học - tất cả các role đều được phép
   @Delete(':id')
   @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles('admin', 'teacher')
+  @Roles('admin', 'admin-teacher', 'teacher')
   @HttpCode(HttpStatus.OK)
   @ResponseMessage('Xóa lịch học thành công')
   async delete(@Param('id', ParseIntPipe) id: number) {

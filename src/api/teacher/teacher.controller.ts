@@ -72,20 +72,20 @@ export class TeacherController {
     return teacher;
   }
 
-  // [SECURITY] Chỉ admin mới được tạo giáo viên mới
+  // [SECURITY] admin và admin-teacher được tạo giáo viên mới
   @Post()
   @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles('admin')
+  @Roles('admin', 'admin-teacher')
   @HttpCode(HttpStatus.OK)
   @ResponseMessage('Tạo giáo viên thành công')
   async create(@Body() dto: TeacherCreateDto) {
     return this.teacherService.create(dto);
   }
 
-  // [SECURITY] Chỉ admin mới được cập nhật thông tin giáo viên
+  // [SECURITY] admin và admin-teacher được cập nhật thông tin giáo viên
   @Put(':id')
   @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles('admin')
+  @Roles('admin', 'admin-teacher')
   @HttpCode(HttpStatus.OK)
   @ResponseMessage('Cập nhật giáo viên thành công')
   async update(
@@ -99,10 +99,10 @@ export class TeacherController {
     return result;
   }
 
-  // [SECURITY] Chỉ admin mới được xóa giáo viên
+  // [SECURITY] admin và admin-teacher được xóa giáo viên
   @Delete(':id')
   @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles('admin')
+  @Roles('admin', 'admin-teacher')
   @HttpCode(HttpStatus.OK)
   @ResponseMessage('Xóa giáo viên thành công')
   async delete(@Param('id', ParseIntPipe) id: number) {

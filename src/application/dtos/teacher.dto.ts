@@ -6,7 +6,7 @@ import {
   IsDateString,
   IsEmail,
 } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, PartialType } from '@nestjs/swagger';
 
 export class TeacherCreateDto {
   @ApiProperty({ description: 'Họ và tên giáo viên' })
@@ -24,10 +24,10 @@ export class TeacherCreateDto {
   @IsString()
   gender?: string;
 
-  @ApiProperty({ description: 'Số điện thoại', required: false })
-  @IsOptional()
+  @ApiProperty({ description: 'Số điện thoại' })
+  @IsNotEmpty({ message: 'Số điện thoại không được để trống' })
   @IsString()
-  phone_number?: string;
+  phone_number: string;
 
   @ApiProperty({ description: 'Địa chỉ', required: false })
   @IsOptional()
@@ -50,4 +50,4 @@ export class TeacherCreateDto {
   account_id?: number;
 }
 
-export class TeacherUpdateDto extends TeacherCreateDto {}
+export class TeacherUpdateDto extends PartialType(TeacherCreateDto) {}

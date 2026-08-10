@@ -34,9 +34,9 @@ import { RolesGuard } from '../../common/guards/roles.guard';
 export class StudentController {
   constructor(private readonly studentService: StudentService) {}
 
-  // [SECURITY] Xem danh sách - admin và teacher đều được phép
+  // [SECURITY] Xem danh sách - admin, admin-teacher và teacher đều được phép
   @Get()
-  @Roles('admin', 'teacher')
+  @Roles('admin', 'admin-teacher', 'teacher')
   @ApiQuery({ name: 'pageNumber', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'pageSize', required: false, type: Number, example: 10 })
   @ApiQuery({ name: 'keyword', required: false, type: String })
@@ -63,9 +63,9 @@ export class StudentController {
     };
   }
 
-  // [SECURITY] Xem chi tiết - admin và teacher đều được phép
+  // [SECURITY] Xem chi tiết - admin, admin-teacher và teacher đều được phép
   @Get(':id')
-  @Roles('admin', 'teacher')
+  @Roles('admin', 'admin-teacher', 'teacher')
   @ResponseMessage('Lấy học viên thành công')
   async getById(@Param('id', ParseIntPipe) id: number) {
     const student = await this.studentService.getById(id);
@@ -77,7 +77,7 @@ export class StudentController {
 
   // [SECURITY] Tạo học viên - chỉ admin
   @Post()
-  @Roles('admin')
+  @Roles('admin', 'admin-teacher')
   @HttpCode(HttpStatus.OK)
   @ResponseMessage('Tạo học viên thành công')
   async create(@Body() dto: StudentCreateDto) {
@@ -86,7 +86,7 @@ export class StudentController {
 
   // [SECURITY] Cập nhật học viên - chỉ admin
   @Put(':id')
-  @Roles('admin')
+  @Roles('admin', 'admin-teacher')
   @HttpCode(HttpStatus.OK)
   @ResponseMessage('Cập nhật học viên thành công')
   async update(
@@ -102,7 +102,7 @@ export class StudentController {
 
   // [SECURITY] Xóa học viên - chỉ admin
   @Delete(':id')
-  @Roles('admin')
+  @Roles('admin', 'admin-teacher')
   @HttpCode(HttpStatus.OK)
   @ResponseMessage('Xóa học viên thành công')
   async delete(@Param('id', ParseIntPipe) id: number) {

@@ -42,6 +42,11 @@ export class RolesGuard implements CanActivate {
     // Ép kiểu user về JwtUserPayload để tránh lỗi "Unsafe member access on any"
     const request = context.switchToHttp().getRequest();
     const user = request.user as JwtUserPayload | undefined;
+    
+    // Normalize user role for backward compatibility
+    let userRole = (user?.role || '').toLowerCase();
+    if (userRole === 'administrator') userRole = 'admin';
+    if (userRole === 'user') userRole = 'teacher';
 
     // Nếu không có user (chưa xác thực) -> từ chối
     if (!user || !user.role) {
@@ -51,7 +56,7 @@ export class RolesGuard implements CanActivate {
     }
 
     // Kiểm tra role của user có nằm trong danh sách roles được phép không
-    const hasRole = requiredRoles.includes(user.role);
+    const hasRole = requiredRoles.includes(userRole);
     if (!hasRole) {
       throw new ForbiddenException(
         `Vai trò '${user.role}' không có quyền thực hiện hành động này. Yêu cầu: ${requiredRoles.join(", ")}`,
