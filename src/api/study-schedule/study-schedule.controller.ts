@@ -22,6 +22,9 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { ResponseMessage } from '../../common/decorators/response-message.decorator';
 import { ApiTags, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
+// [SECURITY] Import RBAC - Phân quyền API theo vai trò
+import { Roles } from '../../common/decorators/roles.decorator';
+import { RolesGuard } from '../../common/guards/roles.guard';
 
 @ApiTags('StudySchedules')
 @ApiBearerAuth()
@@ -29,6 +32,7 @@ import { ApiTags, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 export class StudyScheduleController {
   constructor(private readonly studyScheduleService: StudyScheduleService) {}
 
+  // [SECURITY] GET danh sách lịch học - public (không cần đăng nhập)
   @Get()
   @ApiQuery({ name: 'pageNumber', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'pageSize', required: false, type: Number, example: 10 })
@@ -39,11 +43,13 @@ export class StudyScheduleController {
     pageNumber: number,
     @Query('pageSize', new DefaultValuePipe(10), ParseIntPipe) pageSize: number,
     @Query('keyword') keyword?: string,
+    @Query('dateRegister') dateRegister?: string,
   ) {
     const result = await this.studyScheduleService.getAll(
       pageNumber,
       pageSize,
       keyword,
+      dateRegister,
     );
     const totalPages = Math.ceil(result.TotalCount / pageSize);
 
@@ -56,6 +62,7 @@ export class StudyScheduleController {
     };
   }
 
+  // [SECURITY] GET lịch full-calendar - public (không cần đăng nhập)
   @Get('full-calendar')
   @ResponseMessage('Lấy lịch học full-calendar thành công')
   async getFullCalendar(
@@ -63,15 +70,18 @@ export class StudyScheduleController {
     pageNumber: number,
     @Query('pageSize', new DefaultValuePipe(10), ParseIntPipe) pageSize: number,
     @Query('keyword') keyword?: string,
+    @Query('dateRegister') dateRegister?: string,
   ) {
     const result = await this.studyScheduleService.getAll(
       pageNumber,
       pageSize,
       keyword,
+      dateRegister,
     );
     return result.Items;
   }
 
+  // [SECURITY] GET chi tiết lịch học - public
   @Get(':id')
   @ResponseMessage('Lấy lịch học thành công')
   async getById(@Param('id', ParseIntPipe) id: number) {
@@ -82,16 +92,20 @@ export class StudyScheduleController {
     return item;
   }
 
+  // [SECURITY] Tạo lịch học - yêu cầu đăng nhập, admin và teacher đều được phép
   @Post()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('admin', 'teacher')
   @HttpCode(HttpStatus.OK)
   @ResponseMessage('Tạo lịch học thành công')
   async create(@Body() dto: StudyScheduleCreateDto) {
     return this.studyScheduleService.create(dto);
   }
 
+  // [SECURITY] Cập nhật lịch học (endpoint update-schedule) - admin và teacher đều được phép
   @Put('update-schedule/:id')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('admin', 'teacher')
   @HttpCode(HttpStatus.OK)
   @ResponseMessage('Cập nhật lịch học thành công')
   async updateSchedule(
@@ -105,8 +119,10 @@ export class StudyScheduleController {
     return result;
   }
 
+  // [SECURITY] Cập nhật lịch học (endpoint chính) - admin và teacher đều được phép
   @Put(':id')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('admin', 'teacher')
   @HttpCode(HttpStatus.OK)
   @ResponseMessage('Cập nhật lịch học thành công')
   async update(
@@ -120,8 +136,10 @@ export class StudyScheduleController {
     return result;
   }
 
+  // [SECURITY] Xóa lịch học - admin và teacher đều được phép
   @Delete(':id')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('admin', 'teacher')
   @HttpCode(HttpStatus.OK)
   @ResponseMessage('Xóa lịch học thành công')
   async delete(@Param('id', ParseIntPipe) id: number) {

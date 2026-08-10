@@ -24,11 +24,17 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { ResponseMessage } from '../../common/decorators/response-message.decorator';
 import { ApiTags, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
+// [SECURITY] Import RBAC - Phân quyền API theo vai trò
+import { Roles } from '../../common/decorators/roles.decorator';
+import { RolesGuard } from '../../common/guards/roles.guard';
 
 @ApiTags('Account')
 @ApiBearerAuth()
 @Controller('api/Account')
-@UseGuards(AuthGuard('jwt'))
+// [SECURITY] Yêu cầu đăng nhập + kiểm tra quyền cho toàn bộ controller
+@UseGuards(AuthGuard('jwt'), RolesGuard)
+// [SECURITY] Chỉ admin mới được quản lý tài khoản
+@Roles('admin')
 export class AccountController {
   constructor(private readonly accountService: AccountService) {}
 

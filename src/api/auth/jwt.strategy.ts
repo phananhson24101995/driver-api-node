@@ -12,10 +12,19 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     private configService: ConfigService,
     @InjectModel(Account.name) private accountModel: Model<AccountDocument>,
   ) {
+    // [SECURITY] Lấy JWT_SECRET từ env, throw error nếu không tồn tại
+    // Không sử dụng fallback secret để tránh lỗ hổng bảo mật trên production
+    const jwtSecret = configService.get<string>('JWT_SECRET');
+    if (!jwtSecret) {
+      throw new Error(
+        'JWT_SECRET chưa được cấu hình trong biến môi trường (.env). Hệ thống không thể khởi động.',
+      );
+    }
+
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: configService.get<string>('JWT_SECRET') || 'fallback_secret',
+      secretOrKey: jwtSecret,
     });
   }
 

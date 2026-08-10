@@ -22,6 +22,9 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { ResponseMessage } from '../../common/decorators/response-message.decorator';
 import { ApiTags, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
+// [SECURITY] Import RBAC - Phân quyền API theo vai trò
+import { Roles } from '../../common/decorators/roles.decorator';
+import { RolesGuard } from '../../common/guards/roles.guard';
 
 @ApiTags('Teacher')
 @ApiBearerAuth()
@@ -29,6 +32,7 @@ import { ApiTags, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 export class TeacherController {
   constructor(private readonly teacherService: TeacherService) {}
 
+  // [SECURITY] GET danh sách giáo viên - cho phép xem mà không cần phân quyền
   @Get()
   @ApiQuery({ name: 'pageNumber', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'pageSize', required: false, type: Number, example: 10 })
@@ -57,6 +61,7 @@ export class TeacherController {
     };
   }
 
+  // [SECURITY] GET chi tiết giáo viên - cho phép xem mà không cần phân quyền
   @Get(':id')
   @ResponseMessage('Lấy giáo viên thành công')
   async getById(@Param('id', ParseIntPipe) id: number) {
@@ -67,16 +72,20 @@ export class TeacherController {
     return teacher;
   }
 
+  // [SECURITY] Chỉ admin mới được tạo giáo viên mới
   @Post()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('admin')
   @HttpCode(HttpStatus.OK)
   @ResponseMessage('Tạo giáo viên thành công')
   async create(@Body() dto: TeacherCreateDto) {
     return this.teacherService.create(dto);
   }
 
+  // [SECURITY] Chỉ admin mới được cập nhật thông tin giáo viên
   @Put(':id')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('admin')
   @HttpCode(HttpStatus.OK)
   @ResponseMessage('Cập nhật giáo viên thành công')
   async update(
@@ -90,8 +99,10 @@ export class TeacherController {
     return result;
   }
 
+  // [SECURITY] Chỉ admin mới được xóa giáo viên
   @Delete(':id')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('admin')
   @HttpCode(HttpStatus.OK)
   @ResponseMessage('Xóa giáo viên thành công')
   async delete(@Param('id', ParseIntPipe) id: number) {

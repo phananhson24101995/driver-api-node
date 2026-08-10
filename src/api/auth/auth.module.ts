@@ -11,15 +11,24 @@ import { JwtStrategy } from './jwt.strategy';
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET'),
-        signOptions: {
-          expiresIn: configService.get<string>(
-            'JWT_EXPIRATION',
-            '7d',
-          ) as unknown as number,
-        },
-      }),
+      useFactory: (configService: ConfigService) => {
+        // [SECURITY] Kiểm tra JWT_SECRET phải tồn tại trong env
+        const secret = configService.get<string>('JWT_SECRET');
+        if (!secret) {
+          throw new Error(
+            'JWT_SECRET chưa được cấu hình trong biến môi trường (.env).',
+          );
+        }
+        return {
+          secret,
+          signOptions: {
+            expiresIn: configService.get<string>(
+              'JWT_EXPIRATION',
+              '7d',
+            ) as unknown as number,
+          },
+        };
+      },
       inject: [ConfigService],
     }),
   ],

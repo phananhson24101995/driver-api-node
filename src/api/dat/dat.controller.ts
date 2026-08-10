@@ -27,6 +27,9 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { ResponseMessage } from '../../common/decorators/response-message.decorator';
 import { ApiTags, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
+// [SECURITY] Import RBAC - Phân quyền API theo vai trò
+import { Roles } from '../../common/decorators/roles.decorator';
+import { RolesGuard } from '../../common/guards/roles.guard';
 
 @ApiTags('Dat')
 @ApiBearerAuth()
@@ -34,6 +37,7 @@ import { ApiTags, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 export class DatController {
   constructor(private readonly datService: DatService) {}
 
+  // [SECURITY] GET danh sách DAT - cho phép xem mà không cần phân quyền
   @Get()
   @ApiQuery({ name: 'pageNumber', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'pageSize', required: false, type: Number, example: 10 })
@@ -57,6 +61,7 @@ export class DatController {
     };
   }
 
+  // [SECURITY] GET chi tiết DAT - cho phép xem mà không cần phân quyền
   @Get(':id')
   @ResponseMessage('Lấy DAT thành công')
   async getById(@Param('id', ParseIntPipe) id: number) {
@@ -67,16 +72,20 @@ export class DatController {
     return item;
   }
 
+  // [SECURITY] Chỉ admin mới được tạo thiết bị DAT mới
   @Post()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('admin')
   @HttpCode(HttpStatus.OK)
   @ResponseMessage('Tạo DAT thành công')
   async create(@Body() dto: DatCreateDto) {
     return this.datService.create(dto);
   }
 
+  // [SECURITY] Chỉ admin mới được cập nhật thông tin DAT
   @Put(':id')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('admin')
   @HttpCode(HttpStatus.OK)
   @ResponseMessage('Cập nhật DAT thành công')
   async update(
@@ -90,8 +99,10 @@ export class DatController {
     return result;
   }
 
+  // [SECURITY] Chỉ admin mới được xóa thiết bị DAT
   @Delete(':id')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('admin')
   @HttpCode(HttpStatus.OK)
   @ResponseMessage('Xóa DAT thành công')
   async delete(@Param('id', ParseIntPipe) id: number) {
@@ -102,8 +113,10 @@ export class DatController {
     return null;
   }
 
+  // [SECURITY] Admin và giáo viên đều có thể giao thiết bị DAT
   @Post(':id/assign')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('admin', 'teacher')
   @HttpCode(HttpStatus.OK)
   @ResponseMessage('Giao thiết bị DAT thành công')
   async assign(
@@ -115,8 +128,10 @@ export class DatController {
     return this.datService.assign(id, dto, username);
   }
 
+  // [SECURITY] Admin và giáo viên đều có thể thu hồi thiết bị DAT
   @Post(':id/return')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('admin', 'teacher')
   @HttpCode(HttpStatus.OK)
   @ResponseMessage('Thu hồi thiết bị DAT thành công')
   async returnDat(
@@ -128,8 +143,10 @@ export class DatController {
     return this.datService.returnDat(id, dto, username);
   }
 
+  // [SECURITY] Admin và giáo viên đều có thể báo bảo hành thiết bị DAT
   @Post(':id/maintenance')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('admin', 'teacher')
   @HttpCode(HttpStatus.OK)
   @ResponseMessage('Báo bảo hành thiết bị DAT thành công')
   async maintenance(
@@ -141,6 +158,7 @@ export class DatController {
     return this.datService.maintenance(id, dto, username);
   }
 
+  // [SECURITY] GET lịch sử DAT - cho phép xem mà không cần phân quyền
   @Get(':id/history')
   @ResponseMessage('Lấy lịch sử thiết bị DAT thành công')
   async getHistory(@Param('id', ParseIntPipe) id: number) {

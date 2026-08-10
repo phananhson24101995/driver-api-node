@@ -1,6 +1,10 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
+import { ScheduleModule } from '@nestjs/schedule';
+// [SECURITY] Import ThrottlerModule để chống brute-force và DoS attack
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AccountModule } from './api/account/account.module';
@@ -14,7 +18,13 @@ import { StudyScheduleModule } from './api/study-schedule/study-schedule.module'
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath:
+        process.env.NODE_ENV === 'production'
+          ? '.env.production'
+          : '.env.development',
+    }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
@@ -22,6 +32,17 @@ import { StudyScheduleModule } from './api/study-schedule/study-schedule.module'
       }),
       inject: [ConfigService],
     }),
+
+    // [SECURITY] Rate Limiting - Giới hạn 60 requests mỗi 60 giây (1 phút) cho mỗi IP
+    // Ngăn chặn brute-force login, DoS attack
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60000, // 60 giây (đơn vị milliseconds)
+        limit: 60, // Tối đa 60 requests
+      },
+    ]),
+
+    ScheduleModule.forRoot(),
     DatabaseModule,
     AccountModule,
     TeacherModule,
@@ -32,6 +53,13 @@ import { StudyScheduleModule } from './api/study-schedule/study-schedule.module'
     StudyScheduleModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    // [SECURITY] Đăng ký ThrottlerGuard global - áp dụng rate limiting cho tất cả API
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+  ],
 })
 export class AppModule {}
