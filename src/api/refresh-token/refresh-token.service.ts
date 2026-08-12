@@ -17,14 +17,39 @@ export class RefreshTokenManagementService {
   /** Lấy tất cả refresh tokens với phân trang */
   async getAll(pageNumber: number, pageSize: number) {
     const skip = (pageNumber - 1) * pageSize;
+    // Chỉ lấy dữ liệu 5 ngày gần nhất
+    const fiveDaysAgo = new Date();
+    fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5);
+    const filter = { created_at: { $gte: fiveDaysAgo } };
+
     const [Items, TotalCount] = await Promise.all([
       this.refreshTokenModel
-        .find()
-        .sort({ created_at: -1 })
-        .skip(skip)
-        .limit(pageSize)
-        .lean(),
-      this.refreshTokenModel.countDocuments(),
+        .aggregate([
+          { $match: filter },
+          { $sort: { created_at: -1 } },
+          { $skip: skip },
+          { $limit: pageSize },
+          {
+            $lookup: {
+              from: 'accounts',
+              localField: 'account_id',
+              foreignField: 'id',
+              as: 'account',
+            },
+          },
+          {
+            $addFields: {
+              username: { $arrayElemAt: ['$account.username', 0] },
+            },
+          },
+          {
+            $project: {
+              account: 0,
+            },
+          },
+        ])
+        .exec(),
+      this.refreshTokenModel.countDocuments(filter),
     ]);
     return { Items, TotalCount };
   }

@@ -1,5 +1,11 @@
 // === DTO cho module Role - Validate dữ liệu đầu vào ===
-import { IsNotEmpty, IsOptional, IsString, IsBoolean, IsArray } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsBoolean,
+  IsArray,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 // DTO tạo mới Role
@@ -14,12 +20,20 @@ export class RoleCreateDto {
   @IsString()
   label: string;
 
-  @ApiProperty({ description: 'Mô tả vai trò', required: false, example: 'Vai trò quản lý chung' })
+  @ApiProperty({
+    description: 'Mô tả vai trò',
+    required: false,
+    example: 'Vai trò quản lý chung',
+  })
   @IsOptional()
   @IsString()
   description?: string;
 
-  @ApiProperty({ description: 'Đánh dấu role hệ thống', required: false, default: false })
+  @ApiProperty({
+    description: 'Đánh dấu role hệ thống',
+    required: false,
+    default: false,
+  })
   @IsOptional()
   @IsBoolean()
   is_system?: boolean;
@@ -37,13 +51,21 @@ export class RoleCreateDto {
   permissions?: string[];
 
   // [DYNAMIC PERMISSIONS] Loại layout sử dụng
-  @ApiProperty({ description: 'Loại layout (main hoặc admin)', required: false, default: 'admin' })
+  @ApiProperty({
+    description: 'Loại layout (main hoặc admin)',
+    required: false,
+    default: 'admin',
+  })
   @IsOptional()
   @IsString()
   layout?: string;
 
   // [DYNAMIC PERMISSIONS] Prefix URL cho role
-  @ApiProperty({ description: 'Prefix URL cho role', required: false, example: '/admin' })
+  @ApiProperty({
+    description: 'Prefix URL cho role',
+    required: false,
+    example: '/admin',
+  })
   @IsOptional()
   @IsString()
   base_path?: string;
@@ -83,7 +105,10 @@ export class RoleUpdateDto {
   permissions?: string[];
 
   // [DYNAMIC PERMISSIONS] Loại layout sử dụng
-  @ApiProperty({ description: 'Loại layout (main hoặc admin)', required: false })
+  @ApiProperty({
+    description: 'Loại layout (main hoặc admin)',
+    required: false,
+  })
   @IsOptional()
   @IsString()
   layout?: string;

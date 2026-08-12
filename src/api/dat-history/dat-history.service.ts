@@ -17,14 +17,20 @@ export class DatHistoryManagementService {
   /** Lấy tất cả lịch sử DAT với phân trang */
   async getAll(pageNumber: number, pageSize: number) {
     const skip = (pageNumber - 1) * pageSize;
+
+    // Chỉ lấy dữ liệu 5 ngày gần nhất
+    const fiveDaysAgo = new Date();
+    fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5);
+    const filter = { create_update: { $gte: fiveDaysAgo } };
+
     const [Items, TotalCount] = await Promise.all([
       this.datHistoryModel
-        .find()
+        .find(filter)
         .sort({ action_date: -1 })
         .skip(skip)
         .limit(pageSize)
         .lean(),
-      this.datHistoryModel.countDocuments(),
+      this.datHistoryModel.countDocuments(filter),
     ]);
     return { Items, TotalCount };
   }

@@ -8,3 +8,4 @@ export * from './refresh-token.entity';
 export * from './dat-history.entity';
 // [ROLE MANAGEMENT] Export Role entity
 export * from './role.entity';
+export * from './audit-log.entity';

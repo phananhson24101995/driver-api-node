@@ -31,7 +31,7 @@ export class DatHistory {
   @Prop()
   last_editor?: string;
 
-  @Prop()
+  @Prop({ expires: '5d' })
   create_update?: Date;
 
   @Prop()

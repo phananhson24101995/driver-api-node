@@ -4,9 +4,10 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ScheduleModule } from '@nestjs/schedule';
 // [SECURITY] Import ThrottlerModule để chống brute-force và DoS attack
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 import { AccountModule } from './api/account/account.module';
 import { TeacherModule } from './api/teacher/teacher.module';
 import { AuthModule } from './api/auth/auth.module';
@@ -19,6 +20,7 @@ import { RefreshTokenManagementModule } from './api/refresh-token/refresh-token.
 import { DatHistoryManagementModule } from './api/dat-history/dat-history.module';
 // [ROLE MANAGEMENT] Import RoleModule
 import { RoleModule } from './api/role/role.module';
+import { AuditLogModule } from './api/audit-log/audit-log.module';
 
 @Module({
   imports: [
@@ -62,6 +64,7 @@ import { RoleModule } from './api/role/role.module';
     DatHistoryManagementModule,
     // [ROLE MANAGEMENT] Đăng ký RoleModule
     RoleModule,
+    AuditLogModule,
   ],
   controllers: [AppController],
   providers: [
@@ -70,6 +73,10 @@ import { RoleModule } from './api/role/role.module';
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: LoggingInterceptor,
     },
   ],
 })
