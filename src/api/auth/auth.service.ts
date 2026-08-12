@@ -6,7 +6,7 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 import { randomBytes } from 'crypto';
 import { Account, AccountDocument } from '../../domain/entities/account.entity';
 import { Teacher, TeacherDocument } from '../../domain/entities/teacher.entity';

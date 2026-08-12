@@ -24,10 +24,13 @@ import { RoleModule } from './api/role/role.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath:
-        process.env.NODE_ENV === 'production'
-          ? '.env.production'
+      // [FIX] Load env file based on NODE_ENV, với fallback sang .env nếu file đặc thù không tồn tại
+      envFilePath: [
+        process.env.NODE_ENV
+          ? `.env.${process.env.NODE_ENV}`
           : '.env.development',
+        '.env',
+      ],
     }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],

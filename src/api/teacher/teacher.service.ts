@@ -7,7 +7,7 @@ import {
   TeacherCreateDto,
   TeacherUpdateDto,
 } from '../../application/dtos/teacher.dto';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class TeacherService {

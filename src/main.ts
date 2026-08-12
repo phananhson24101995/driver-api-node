@@ -26,17 +26,30 @@ async function bootstrap() {
   console.log('Allowed CORS Origins:', allowedOrigins);
 
   app.enableCors({
-    origin: true, // Reflect the request origin
+    origin: (origin, callback) => {
+      if (!origin) {
+        // Cho phép request nội bộ, không có Origin header
+        return callback(null, true);
+      }
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      console.warn('Blocked CORS origin:', origin);
+      return callback(new Error(`Origin ${origin} is not allowed by CORS`));
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    // [FIX] Thêm các custom headers mà frontend gửi (expire-access-token, expire-refresh-token)
-    // để tránh lỗi CORS preflight khi trình duyệt kiểm tra Access-Control-Allow-Headers
-    allowedHeaders: [
-      'Content-Type',
-      'Authorization',
-      'expire-access-token',
-      'expire-refresh-token',
-    ],
+    // allowedHeaders: [
+    //   'Content-Type',
+    //   'Authorization',
+    //   'Accept',
+    //   'Origin',
+    //   'X-Requested-With',
+    //   'X-Requested-By',
+    // ],
+    // optionsSuccessStatus: 204,
   });
 
   // Validation

@@ -24,7 +24,14 @@ dist-ssr
 *.sw?
 .env.development
 .env.production
-.env
+.env.test
 src/sync-study-schedule.ts
 src/seed-accounts.ts
 src/seed-admin.ts
+src/sync-teachers.ts
+src/sync-dats.ts
+
+
+deploy-api-prod.ps1
+deploy-api-test.ps1
+dist-ncc

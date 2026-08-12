@@ -7,7 +7,7 @@ import {
   AccountUpdateDto,
   ChangePasswordDto,
 } from '../../application/dtos/account.dto';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class AccountService {
