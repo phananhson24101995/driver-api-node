@@ -22,7 +22,7 @@ async function bootstrap() {
       { username: 'duynd', role: 'teacher' },
       { username: 'tuanpa', role: 'teacher' },
       { username: 'caucuong', role: 'teacher' },
-      { username: 'supperadmin', role: 'superp_admin' },
+      { username: 'superadmin', role: 'super_admin' },
       { username: 'admin', role: 'admin' },
     ];
 
@@ -32,12 +32,17 @@ async function bootstrap() {
     for (const acc of accountsToSeed) {
       const exists = await accountModel.findOne({ username: acc.username });
       if (exists) {
-        console.log(`⚠️ Tài khoản '${acc.username}' đã tồn tại. Bỏ qua.`);
+        console.log(
+          `⚠️ Tài khoản '${acc.username}' đã tồn tại. Đang cập nhật roles...`,
+        );
+        exists.roles = [acc.role];
+        await exists.save();
+        console.log(`✅ Đã cập nhật roles cho tài khoản: ${acc.username}`);
       } else {
         const newAccount = new accountModel({
           username: acc.username,
           password_hash: hashedPassword,
-          role: acc.role,
+          roles: [acc.role],
         });
         await newAccount.save();
         console.log(`✅ Đã tạo tài khoản: ${acc.username}`);

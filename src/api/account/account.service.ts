@@ -25,7 +25,8 @@ export class AccountService {
       const lowerKeyword = keyword.toLowerCase();
       filter.$or = [
         { username: { $regex: lowerKeyword, $options: 'i' } },
-        { role: { $regex: lowerKeyword, $options: 'i' } },
+        // [MULTI-ROLE] Tìm trong mảng roles
+        { roles: { $regex: lowerKeyword, $options: 'i' } },
       ];
     }
 
@@ -59,7 +60,8 @@ export class AccountService {
     const account = new this.accountModel({
       username: dto.username,
       password_hash: hashedPassword,
-      role: dto.role,
+      // [MULTI-ROLE] Lưu mảng roles (backward compat: nhận role đơn hoặc roles mảng)
+      roles: dto.roles || (dto.role ? [dto.role] : ['teacher']),
       create_editor: dto.create_editor,
     });
 
@@ -72,8 +74,12 @@ export class AccountService {
     const account = await this.accountModel.findOne({ id });
     if (!account) return null;
 
-    if (dto.role) {
-      account.role = dto.role;
+    // [MULTI-ROLE] Cập nhật mảng roles (backward compat: nhận role đơn hoặc roles mảng)
+    if (dto.roles) {
+      account.roles = dto.roles;
+      account.last_editor = dto.last_editor;
+    } else if (dto.role) {
+      account.roles = [dto.role];
       account.last_editor = dto.last_editor;
     }
 

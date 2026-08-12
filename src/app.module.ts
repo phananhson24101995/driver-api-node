@@ -17,6 +17,8 @@ import { DatModule } from './api/dat/dat.module';
 import { StudyScheduleModule } from './api/study-schedule/study-schedule.module';
 import { RefreshTokenManagementModule } from './api/refresh-token/refresh-token.module';
 import { DatHistoryManagementModule } from './api/dat-history/dat-history.module';
+// [ROLE MANAGEMENT] Import RoleModule
+import { RoleModule } from './api/role/role.module';
 
 @Module({
   imports: [
@@ -55,6 +57,8 @@ import { DatHistoryManagementModule } from './api/dat-history/dat-history.module
     StudyScheduleModule,
     RefreshTokenManagementModule,
     DatHistoryManagementModule,
+    // [ROLE MANAGEMENT] Đăng ký RoleModule
+    RoleModule,
   ],
   controllers: [AppController],
   providers: [

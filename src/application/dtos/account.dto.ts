@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, IsArray } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class AccountCreateDto {
@@ -12,10 +12,24 @@ export class AccountCreateDto {
   @IsString()
   password: string;
 
-  @ApiProperty({ description: 'Vai trò', example: 'admin' })
-  @IsNotEmpty({ message: 'Role không được để trống' })
+  // [MULTI-ROLE] Backward compat: vẫn nhận role đơn
+  @ApiProperty({
+    description: 'Vai trò (đơn, backward compat)',
+    required: false,
+  })
+  @IsOptional()
   @IsString()
-  role: string;
+  role?: string;
+
+  // [MULTI-ROLE] Mảng roles mới
+  @ApiProperty({
+    description: 'Danh sách vai trò',
+    example: ['admin'],
+    required: false,
+  })
+  @IsOptional()
+  @IsArray()
+  roles?: string[];
 
   @ApiProperty({ description: 'Người tạo', required: false })
   @IsOptional()
@@ -24,10 +38,24 @@ export class AccountCreateDto {
 }
 
 export class AccountUpdateDto {
-  @ApiProperty({ description: 'Vai trò', required: false })
+  // [MULTI-ROLE] Backward compat: vẫn nhận role đơn
+  @ApiProperty({
+    description: 'Vai trò (đơn, backward compat)',
+    required: false,
+  })
   @IsOptional()
   @IsString()
   role?: string;
+
+  // [MULTI-ROLE] Mảng roles mới
+  @ApiProperty({
+    description: 'Danh sách vai trò',
+    example: ['admin', 'teacher-manager'],
+    required: false,
+  })
+  @IsOptional()
+  @IsArray()
+  roles?: string[];
 
   @ApiProperty({ description: 'Người cập nhật cuối', required: false })
   @IsOptional()

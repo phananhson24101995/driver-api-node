@@ -28,7 +28,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: { username: string; sub: number; role: string }) {
+  // [MULTI-ROLE] JWT payload chứa mảng roles thay vì role đơn
+  async validate(payload: { username: string; sub: number; roles: string[] }) {
     const account = await this.accountModel.findOne({
       username: payload.username,
     });
@@ -38,7 +39,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     return {
       id: account.id,
       username: account.username,
-      role: account.role,
+      // [MULTI-ROLE] Trả về mảng roles từ DB (luôn cập nhật nhất)
+      roles: account.roles || [],
     };
   }
 }

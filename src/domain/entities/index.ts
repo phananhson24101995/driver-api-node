@@ -6,3 +6,5 @@ export * from './dat.entity';
 export * from './study-schedule.entity';
 export * from './refresh-token.entity';
 export * from './dat-history.entity';
+// [ROLE MANAGEMENT] Export Role entity
+export * from './role.entity';

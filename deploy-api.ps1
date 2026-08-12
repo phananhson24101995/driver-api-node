@@ -11,11 +11,11 @@ npm run build
 Check-ExitCode "Build"
 
 Write-Host "2. Upload files to VPS..."
-scp -r dist package.json package-lock.json .env deploy@160.250.65.164:/var/www/booking-dat/api/
+scp -r dist package.json package-lock.json .env.production deploy@160.250.65.164:/var/www/booking-dat-prod/api/
 Check-ExitCode "Upload files"
 
 Write-Host "3. Install dependencies and restart API..."
-ssh deploy@160.250.65.164 "cd /var/www/booking-dat/api && npm install --omit=dev && pm2 restart booking-dat-api"
+ssh deploy@160.250.65.164 "cd /var/www/booking-dat-prod/api && npm install --omit=dev && (NODE_ENV=production pm2 restart booking-dat-prod-api --update-env || NODE_ENV=production pm2 start dist/main.js --name booking-dat-prod-api)"
 Check-ExitCode "Restart API"
 
 Write-Host ""

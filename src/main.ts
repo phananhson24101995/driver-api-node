@@ -7,19 +7,26 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 // [SECURITY] Import helmet để bảo vệ HTTP headers (chống XSS, Clickjacking, MIME sniffing)
 import helmet from 'helmet';
 
+import { ConfigService } from '@nestjs/config';
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const configService = app.get(ConfigService);
 
   // [SECURITY] Helmet - Thêm các HTTP Security Headers tự động
   app.use(helmet());
 
   // [SECURITY] CORS - Chỉ cho phép các domain được liệt kê trong env CORS_ORIGINS
   // Mặc định cho phép localhost dev và production domain
-  const allowedOrigins = process.env.CORS_ORIGINS
-    ? process.env.CORS_ORIGINS.split(',').map((origin) => origin.trim())
+  const corsEnv = configService.get<string>('CORS_ORIGINS');
+  const allowedOrigins = corsEnv
+    ? corsEnv.split(',').map((origin) => origin.trim())
     : ['http://localhost:5173', 'http://localhost:3000'];
-   app.enableCors({
-    origin: allowedOrigins,
+
+  console.log('Allowed CORS Origins:', allowedOrigins);
+
+  app.enableCors({
+    origin: true, // Reflect the request origin
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     // [FIX] Thêm các custom headers mà frontend gửi (expire-access-token, expire-refresh-token)

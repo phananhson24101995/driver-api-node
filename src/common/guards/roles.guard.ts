@@ -1,4 +1,5 @@
-// RolesGuard - Guard kiểm tra quyền truy cập dựa trên role của user
+// RolesGuard - Guard kiểm tra quyền truy cập dựa trên roles của user
+// [MULTI-ROLE] Hỗ trợ user có nhiều vai trò
 // Hoạt động cùng với @Roles() decorator để phân quyền API
 // Nếu endpoint không gắn @Roles() -> cho phép truy cập (backward compatible)
 // Nếu endpoint có @Roles() nhưng user không đủ quyền -> throw ForbiddenException
@@ -7,15 +8,15 @@ import {
   CanActivate,
   ExecutionContext,
   ForbiddenException,
-} from "@nestjs/common";
-import { Reflector } from "@nestjs/core";
-import { ROLES_KEY } from "../decorators/roles.decorator";
+} from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
+import { ROLES_KEY } from '../decorators/roles.decorator';
 
-// Interface định nghĩa kiểu dữ liệu user được inject vào request bởi JwtStrategy.validate()
+// [MULTI-ROLE] Interface với roles mảng thay vì role đơn
 interface JwtUserPayload {
   id: string;
   username: string;
-  role: string;
+  roles: string[];
 }
 
 @Injectable()
@@ -39,27 +40,34 @@ export class RolesGuard implements CanActivate {
     }
 
     // Lấy thông tin user từ request (đã được JwtStrategy inject)
-    // Ép kiểu user về JwtUserPayload để tránh lỗi "Unsafe member access on any"
-    const request = context.switchToHttp().getRequest();
-    const user = request.user as JwtUserPayload | undefined;
-    
-    // Normalize user role for backward compatibility
-    let userRole = (user?.role || '').toLowerCase();
-    if (userRole === 'administrator') userRole = 'admin';
-    if (userRole === 'user') userRole = 'teacher';
+    const request = context
+      .switchToHttp()
+      .getRequest<{ user?: JwtUserPayload }>();
+    const user = request.user;
 
     // Nếu không có user (chưa xác thực) -> từ chối
-    if (!user || !user.role) {
+    if (!user || !user.roles || user.roles.length === 0) {
       throw new ForbiddenException(
-        "Bạn không có quyền truy cập tài nguyên này",
+        'Bạn không có quyền truy cập tài nguyên này',
       );
     }
 
-    // Kiểm tra role của user có nằm trong danh sách roles được phép không
-    const hasRole = requiredRoles.includes(userRole);
+    // [MULTI-ROLE] Normalize tất cả roles của user cho backward compatibility
+    const normalizedUserRoles = user.roles.map((r) => {
+      let normalized = (r || '').toLowerCase();
+      if (normalized === 'administrator') normalized = 'admin';
+      if (normalized === 'user') normalized = 'teacher';
+      return normalized;
+    });
+
+    // [MULTI-ROLE] Kiểm tra: user có BẤT KỲ role nào khớp required roles không
+    const hasRole = requiredRoles.some((required) =>
+      normalizedUserRoles.includes(required),
+    );
+
     if (!hasRole) {
       throw new ForbiddenException(
-        `Vai trò '${user.role}' không có quyền thực hiện hành động này. Yêu cầu: ${requiredRoles.join(", ")}`,
+        `Vai trò '${user.roles.join(', ')}' không có quyền thực hiện hành động này. Yêu cầu: ${requiredRoles.join(', ')}`,
       );
     }
 

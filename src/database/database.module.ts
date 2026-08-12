@@ -20,6 +20,9 @@ import {
   RefreshTokenSchema,
   DatHistory,
   DatHistorySchema,
+  // [ROLE MANAGEMENT] Import Role entity
+  Role,
+  RoleSchema,
 } from '../domain/entities';
 
 const createAutoIncrementFeature = (name: string, schema: Schema) => ({
@@ -47,6 +50,8 @@ const features = MongooseModule.forFeatureAsync([
   createAutoIncrementFeature(StudySchedule.name, StudyScheduleSchema),
   createAutoIncrementFeature(RefreshToken.name, RefreshTokenSchema),
   createAutoIncrementFeature(DatHistory.name, DatHistorySchema),
+  // [ROLE MANAGEMENT] Đăng ký Role entity với auto-increment
+  createAutoIncrementFeature(Role.name, RoleSchema),
 ]);
 
 @Global()

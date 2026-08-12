@@ -28,8 +28,10 @@ export class Account {
   @Prop({ required: true })
   password_hash: string;
 
-  @Prop({ required: true })
-  role: string;
+  // [MULTI-ROLE] Mảng roles mà user thuộc — cho phép 1 user có nhiều vai trò
+  // MongoDB lưu dạng native array, VD: ['admin', 'teacher-manager']
+  @Prop({ type: [String], required: true, default: ['teacher'] })
+  roles: string[];
 
   @Prop({ default: null })
   refresh_token?: string;

@@ -37,7 +37,8 @@ export class AuthService {
     const account = new this.accountModel({
       username: dto.username,
       password_hash: hashedPassword,
-      role: dto.role,
+      // [MULTI-ROLE] Lưu mảng roles
+      roles: dto.role ? [dto.role] : ['teacher'],
     });
 
     await account.save();
@@ -45,7 +46,8 @@ export class AuthService {
     const payload = {
       username: account.username,
       sub: account.id,
-      role: account.role,
+      // [MULTI-ROLE] JWT payload chứa mảng roles
+      roles: account.roles,
     };
     const accessToken = this.jwtService.sign(payload);
 
@@ -65,7 +67,8 @@ export class AuthService {
       accessToken: accessToken,
       refreshToken: refreshTokenStr,
       username: account.username,
-      role: account.role,
+      // [MULTI-ROLE] Trả về mảng roles
+      roles: account.roles,
     };
   }
 
@@ -85,7 +88,8 @@ export class AuthService {
     const payload = {
       username: account.username,
       sub: account.id,
-      role: account.role,
+      // [MULTI-ROLE] JWT payload chứa mảng roles
+      roles: account.roles,
     };
     const accessToken = this.jwtService.sign(payload);
 
@@ -103,7 +107,8 @@ export class AuthService {
     return {
       accessToken: accessToken,
       refreshToken: refreshTokenStr,
-      role: account.role,
+      // [MULTI-ROLE] Trả về mảng roles
+      roles: account.roles,
       username: account.username,
       teacher: teacher ? teacher.toObject() : null,
     };
@@ -137,7 +142,8 @@ export class AuthService {
     const payload = {
       username: account.username,
       sub: account.id,
-      role: account.role,
+      // [MULTI-ROLE] JWT payload chứa mảng roles
+      roles: account.roles,
     };
     const newAccessToken = this.jwtService.sign(payload);
 
@@ -156,7 +162,8 @@ export class AuthService {
       accessToken: newAccessToken,
       refreshToken: newRefreshTokenStr,
       username: account.username,
-      role: account.role,
+      // [MULTI-ROLE] Trả về mảng roles
+      roles: account.roles,
     };
   }
 
