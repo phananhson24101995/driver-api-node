@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import {
@@ -74,7 +74,21 @@ export class StudyScheduleService {
     return item.toObject();
   }
 
+  private validateDateRegister(dateString?: string | Date) {
+    if (!dateString) return;
+    const dateRegister = new Date(dateString);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (dateRegister.getTime() < today.getTime()) {
+      throw new BadRequestException(
+        'Không thể đăng ký hoặc thay đổi lịch cho ngày trong quá khứ.',
+      );
+    }
+  }
+
   async create(dto: StudyScheduleCreateDto) {
+    this.validateDateRegister(dto.date_register);
     const item = new this.studyScheduleModel(dto);
     await item.save();
 
@@ -84,6 +98,9 @@ export class StudyScheduleService {
   }
 
   async update(id: number, dto: StudyScheduleUpdateDto) {
+    if (dto.date_register) {
+      this.validateDateRegister(dto.date_register);
+    }
     const item = await this.studyScheduleModel.findOneAndUpdate({ id }, dto, {
       new: true,
     });
