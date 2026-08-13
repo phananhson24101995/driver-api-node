@@ -21,6 +21,7 @@ import { DatHistoryManagementModule } from './api/dat-history/dat-history.module
 // [ROLE MANAGEMENT] Import RoleModule
 import { RoleModule } from './api/role/role.module';
 import { AuditLogModule } from './api/audit-log/audit-log.module';
+import { StudentHistoryModule } from './api/student-history/student-history.module';
 
 @Module({
   imports: [
@@ -65,6 +66,7 @@ import { AuditLogModule } from './api/audit-log/audit-log.module';
     // [ROLE MANAGEMENT] Đăng ký RoleModule
     RoleModule,
     AuditLogModule,
+    StudentHistoryModule,
   ],
   controllers: [AppController],
   providers: [

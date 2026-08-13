@@ -9,3 +9,5 @@ export * from './dat-history.entity';
 // [ROLE MANAGEMENT] Export Role entity
 export * from './role.entity';
 export * from './audit-log.entity';
+export * from './student-learning-history.entity';
+export * from './student-exam-history.entity';

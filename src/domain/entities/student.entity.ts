@@ -53,6 +53,12 @@ export class Student {
   @Prop()
   teacher_id?: number;
 
+  @Prop({ default: 'PENDING_OPENING' })
+  learning_status?: string;
+
+  @Prop({ default: 'NOT_STARTED' })
+  exam_status?: string;
+
   @Prop()
   create_editor?: string;
 

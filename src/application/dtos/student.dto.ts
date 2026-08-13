@@ -78,6 +78,16 @@ export class StudentCreateDto {
   @IsOptional()
   @IsNumber()
   teacher_id?: number;
+
+  @ApiProperty({ description: 'Trạng thái học', required: false })
+  @IsOptional()
+  @IsString()
+  learning_status?: string;
+
+  @ApiProperty({ description: 'Trạng thái thi', required: false })
+  @IsOptional()
+  @IsString()
+  exam_status?: string;
 }
 
 export class StudentUpdateDto extends PartialType(StudentCreateDto) {}
